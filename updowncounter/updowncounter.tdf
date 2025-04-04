@@ -1,0 +1,69 @@
+%
+Lukas Krapukaitis, Zachary Baker
+03/31/2025
+ECET 227 - MiniProject 
+
+Updowncounter with range limitations for mini Project
+
+This design implements an 8-bit up/down counter with range limiting
+functionality between 0 and 9. The counter can be enabled/disabled,
+and has separate control signals for counting up and counting down.
+A special output signal indicates when the counter reaches zero.
+
+
+ How it works:
+ 1. When en = 0, the counter holds its current value
+ 2. When endwn = 1 and count > 0, the counter decrements
+ 3. When endwn = 1 and count = 0, the counter holds at 0 and dzero goes high
+ 4. When enup = 1 and count < 9, the counter increments
+ 5. When enup = 1 and count = 9, the counter holds at 9
+ 6. dzero is set to 1 whenever the counter value is 0
+ 
+%
+
+SUBDESIGN updowncounter
+(clrn, clk, en, enup, endwn      :INPUT; --input
+ outcount[7..0], dzero   			:OUTPUT;) --output
+VARIABLE
+	count[7..0]       :DFF; -- 8bit register using D flip flops
+                
+BEGIN
+   count[].clk = clk; --set clock to clk
+   count[].clrn = clrn; --clr counter
+                
+   --Counter logic             
+   IF !en THEN 
+		count[].d = count[].q; 		--hold states to check if counter is enabled at all
+		dzero = GND;                       
+   
+	ELSE         
+      
+	IF count[].q == 0 THEN 			--if enabled, we check to see if it is zero
+		dzero = VCC; 					--set zero indicator when count = 0
+	ELSE
+      dzero = GND; 					--clear zero indicator when count > 0
+   END IF;
+                
+   IF endwn & count[].q == 0 THEN 
+		count[].d = count[].q; 		--hold at minimum value 0
+      dzero = VCC; 					--maintain zero indicator
+                                
+	ELSIF endwn & (count[].q > 0) THEN
+      count[].d = count[].q - 1; 	--decrease value
+      dzero = GND;						--clear zero indicator
+                
+	ELSIF enup & count[].q == 9 THEN
+      count[].d = count[].q;		--hold at max val
+      dzero = GND; 					--clear zero indicator
+                
+	ELSIF enup & (count[].q < 9) THEN
+		count[].d = count[].q + 1; --increment counter
+		dzero = GND; 					--clear zero indicator
+                                
+   ELSE count[].d = count[].q; 	--Hold the value if no valid operation is happening
+      dzero = GND;					--maintain current zero indicator state
+   END IF;
+	END IF;
+	
+	outcount[] = count[]; -- connect output
+END;

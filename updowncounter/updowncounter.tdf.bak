@@ -1,0 +1,49 @@
+%
+Lukas Krapukaitis - Zachary Baker
+03/31/2025
+ECET 227 - MiniProject 
+updowncounter
+%
+
+SUBDESIGN updpwncounter
+(clrn, clk, en, enup, endwn            :INPUT;
+ outcount[7..0], dzero   					:OUTPUT;)
+VARIABLE
+	count[7..0]       :DFF;
+                
+BEGIN
+   count[].clk = clk;
+   count[].clrn = clrn;
+                
+                
+   IF !en THEN count[].d = count[].q;
+		dzero = GND;                       
+   
+	ELSE         
+      
+	IF count[].q == 0 THEN
+		dzero = VCC;
+	ELSE
+      dzero = GND;
+   END IF;
+                
+   IF endwn & count[].q == 0 THEN
+		count[].d = count[].q;
+      dzero = VCC;
+                                
+	ELSIF endwn & (count[].q > 0) THEN
+      count[].d = count[].q - 1;
+      dzero = GND;
+                
+	ELSIF enup & count[].q == 9 THEN
+      count[].d = count[].q;
+      dzero = GND;
+                
+	ELSIF enup & (count[].q < 9) THEN
+		cound[].d = count[].q + 1;
+		dzero = GND;
+                                
+   ELSE count[].d = count[].q;
+      dzero = GND;
+   END IF;
+	END IF;
