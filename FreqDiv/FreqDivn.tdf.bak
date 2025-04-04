@@ -1,0 +1,22 @@
+%
+Lukas Krapukaitis
+ECET 227 - MiniProject 
+%
+
+SUBDESIGN freqdivn
+(clock, Enable	:INPUT; --INPUTS
+ TC				:OUTPUT;) --OUTPUTS
+ 
+VARIABLE
+	scale[25..0]	:DFF; --SIze of clk values to divide
+
+BEGIN
+	scale[].clk = clock; --clk scale is set to internal clock of 50mHz
+	IF scale[].q == 0 THEN scale[].d = 50000000; --check if scale output is zero, if so then scale.d is 50,000,000
+	ELSIF !Enable THEN --If enable
+		scale[].d = scale[].q; -- hold the val of d in q (hold state)
+	ELSIF scale[].q == 1 THEN
+		scale[].d = 50000000; --set scale
+		TC = vcc;	--activate terminal count
+	ELSE
+		scale[].d = scale[].q -1; --decreas

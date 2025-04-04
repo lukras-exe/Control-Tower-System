@@ -1,0 +1,31 @@
+|FreqDivn
+clock => scale[25].CLK
+clock => scale[24].CLK
+clock => scale[23].CLK
+clock => scale[22].CLK
+clock => scale[21].CLK
+clock => scale[20].CLK
+clock => scale[19].CLK
+clock => scale[18].CLK
+clock => scale[17].CLK
+clock => scale[16].CLK
+clock => scale[15].CLK
+clock => scale[14].CLK
+clock => scale[13].CLK
+clock => scale[12].CLK
+clock => scale[11].CLK
+clock => scale[10].CLK
+clock => scale[9].CLK
+clock => scale[8].CLK
+clock => scale[7].CLK
+clock => scale[6].CLK
+clock => scale[5].CLK
+clock => scale[4].CLK
+clock => scale[3].CLK
+clock => scale[2].CLK
+clock => scale[1].CLK
+clock => scale[0].CLK
+Enable => _.IN0
+TC <= TC.DB_MAX_OUTPUT_PORT_TYPE
+
+

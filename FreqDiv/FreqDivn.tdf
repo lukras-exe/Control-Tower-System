@@ -1,0 +1,40 @@
+%
+Lukas Krapukaitis - Zachary Baker
+03/31/2025
+ECET 227 - MiniProject 
+Frequency Division 
+
+This design implements a frequency divider that converts a 50MHz input clock
+to a 1Hz pulse output. It uses a 26-bit counter to divide the frequency by
+counting down from 50,000,000 to 1, then asserting a Terminal Count (TC)
+output signal for one clock cycle before reloading the counter.
+
+How it works:
+ 1. The counter loads 50,000,000 initially and when TC is asserted
+ 2. When Enable is high, the counter decrements on each clock cycle
+ 3. When the counter reaches 1, TC is asserted high for one clock cycle
+ 4. On the next clock cycle, the counter reloads to 50,000,000
+ 5. When Enable is low, the counter holds its current value
+%
+
+SUBDESIGN freqdivn
+(clock, Enable	:INPUT; --INPUTS
+ TC				:OUTPUT;) --OUTPUTS
+ 
+VARIABLE
+	scale[25..0]	:DFF; --Size of clk values to divide
+								-- Needed to count up to 50,000,000 (requires 26 bits)
+BEGIN
+	scale[].clk = clock; 				--clk scale is set to internal clock of 50mHz
+	IF scale[].q == 0 THEN scale[].d = 50000000; 		--check if scale output is zero, if so then scale.d is 50,000,000
+	ELSIF !Enable THEN 						--If enable
+		scale[].d = scale[].q; 				-- hold the val of d in q (hold state)
+	ELSIF scale[].q == 1 THEN
+		scale[].d = 50000000; 				--set scale
+		TC = vcc;								--activate terminal count
+	ELSE
+		scale[].d = scale[].q -1; 			--decrease count by 1
+		TC = GND;                   	-- Keep TC low during counting
+	END IF;
+		
+END;
