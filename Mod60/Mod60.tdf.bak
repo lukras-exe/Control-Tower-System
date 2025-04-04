@@ -1,0 +1,30 @@
+%
+Lukas Krapukaitis - Zachary Baker
+03/31/2025
+ECET 227 - MiniProject 
+Mod60 counter 
+%
+SUBDESIGN mod60
+(clrn, clk, en 	 			:INPUT; --assigning inputs
+ outcount[7..0], RCO, zero	:OUTPUT;) --declaring outputs
+
+VARIABLE 
+	count[7..0]		:DFF; 
+
+BEGIN 
+	count[].clk = clk; --setting clock of count to internal clock
+	count[].clrn = clrn --clear counter asynchronous
+	
+	IF !en THEN count[]/d = count[].q; --hold states
+	
+	ELSIF count[].q == 0 THEN
+		count[].d = 59;
+	ELSE
+		count[].d = count[].q - 1; --decrement
+	END IF;
+	
+	IF count[].q == 1 THEN zero = vcc;
+	END IF;
+	
+	outcount[] = count[]; --output
+END;

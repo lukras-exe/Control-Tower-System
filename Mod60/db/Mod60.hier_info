@@ -1,0 +1,29 @@
+|Mod60
+clrn => count[7].ACLR
+clrn => count[6].ACLR
+clrn => count[5].ACLR
+clrn => count[4].ACLR
+clrn => count[3].ACLR
+clrn => count[2].ACLR
+clrn => count[1].ACLR
+clrn => count[0].ACLR
+clk => count[7].CLK
+clk => count[6].CLK
+clk => count[5].CLK
+clk => count[4].CLK
+clk => count[3].CLK
+clk => count[2].CLK
+clk => count[1].CLK
+clk => count[0].CLK
+en => _.IN0
+outcount[0] <= count[0].DB_MAX_OUTPUT_PORT_TYPE
+outcount[1] <= count[1].DB_MAX_OUTPUT_PORT_TYPE
+outcount[2] <= count[2].DB_MAX_OUTPUT_PORT_TYPE
+outcount[3] <= count[3].DB_MAX_OUTPUT_PORT_TYPE
+outcount[4] <= count[4].DB_MAX_OUTPUT_PORT_TYPE
+outcount[5] <= count[5].DB_MAX_OUTPUT_PORT_TYPE
+outcount[6] <= count[6].DB_MAX_OUTPUT_PORT_TYPE
+outcount[7] <= count[7].DB_MAX_OUTPUT_PORT_TYPE
+zero <= zero.DB_MAX_OUTPUT_PORT_TYPE
+
+

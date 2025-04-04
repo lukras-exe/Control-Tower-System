@@ -1,0 +1,38 @@
+%
+Lukas Krapukaitis - Zachary Baker
+03/31/2025
+ECET 227 - MiniProject 
+Mod60 counter 
+
+This design implements an 8-bit modulo-60 down counter that counts from
+59 down to 0 and then wraps back to 59. The counter can be enabled/disabled
+and has an asynchronous clear input. A special output signal indicates when
+the counter is about to reach zero (when count = 1).
+
+
+%
+SUBDESIGN mod60
+(clrn, clk, en 	 			:INPUT; --assigning inputs
+ outcount[7..0], zero	:OUTPUT;) --declaring outputs
+
+VARIABLE 
+	count[7..0]		:DFF; 	--8-bit register using D flip-flops
+									--Only values 0-59 are used for modulo-60 operation
+
+BEGIN 
+	count[].clk = clk; --setting clock of count to internal clock
+	count[].clrn = clrn; --clear counter asynchronous
+	
+	IF !en THEN count[].d = count[].q; --hold states
+	
+	ELSIF count[].q == 0 THEN
+		count[].d = 59; 			--Wrap around to 59 when counter reaches 0
+	ELSE
+		count[].d = count[].q - 1; --Decrement counter on each clock cycle
+	END IF;
+	
+	IF count[].q == 1 THEN zero = vcc;
+	END IF;
+	
+	outcount[] = count[]; --Connect internal registers to output port
+END;
