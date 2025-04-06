@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<LOG_ROOT>
+	<PROJECT NAME="binbcddes">
+		<CBX_INST_ENTRY INSTANCE_NAME="|binbcddes|lpm_constant0:inst4|lpm_constant:LPM_CONSTANT_component" CBX_FILE_NAME="lpm_constant_4g6.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|binbcddes|lpm_constant1:inst7|lpm_constant:LPM_CONSTANT_component" CBX_FILE_NAME="lpm_constant_bh6.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|binbcddes|lpm_divide0:inst3|lpm_divide:LPM_DIVIDE_component" CBX_FILE_NAME="lpm_divide_krp.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|binbcddes|lpm_divide0:inst2|lpm_divide:LPM_DIVIDE_component" CBX_FILE_NAME="lpm_divide_krp.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|binbcddes|lpm_divide0:inst|lpm_divide:LPM_DIVIDE_component" CBX_FILE_NAME="lpm_divide_krp.tdf"/>
+	</PROJECT>
+</LOG_ROOT>

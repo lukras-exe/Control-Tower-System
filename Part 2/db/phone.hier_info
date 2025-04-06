@@ -1,0 +1,34 @@
+|phone
+binary[0] => _.IN0
+binary[0] => _.IN2
+binary[0] => _.IN0
+binary[0] => segment[5]~2.IN2
+binary[0] => _.IN0
+binary[0] => segment[6]~4.IN2
+binary[0] => _.IN0
+binary[0] => segment[4]~6.IN2
+binary[1] => _.IN0
+binary[1] => _.IN0
+binary[1] => segment[6]~1.IN1
+binary[1] => segment[5]~2.IN1
+binary[1] => _.IN0
+binary[1] => _.IN0
+binary[1] => segment[6]~5.IN1
+binary[1] => segment[4]~6.IN1
+binary[2] => _.IN0
+binary[2] => _.IN0
+binary[2] => _.IN0
+binary[2] => _.IN0
+binary[2] => segment[6]~3.IN0
+binary[2] => segment[6]~4.IN0
+binary[2] => segment[6]~5.IN0
+binary[2] => segment[4]~6.IN0
+segment[0] <= segment[0].DB_MAX_OUTPUT_PORT_TYPE
+segment[1] <= segment[1].DB_MAX_OUTPUT_PORT_TYPE
+segment[2] <= segment[2].DB_MAX_OUTPUT_PORT_TYPE
+segment[3] <= segment[3].DB_MAX_OUTPUT_PORT_TYPE
+segment[4] <= segment[4].DB_MAX_OUTPUT_PORT_TYPE
+segment[5] <= segment[5].DB_MAX_OUTPUT_PORT_TYPE
+segment[6] <= segment[6].DB_MAX_OUTPUT_PORT_TYPE
+
+

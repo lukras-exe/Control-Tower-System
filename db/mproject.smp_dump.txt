@@ -1,0 +1,11 @@
+
+State Machine - |mproject|statemachine:inst|sm
+Name s7 s6 s5 s4 s3 s2 s1 s0 
+s0 0 0 0 0 0 0 0 0 
+s1 0 0 0 0 0 0 1 1 
+s2 0 0 0 0 0 1 0 1 
+s3 0 0 0 0 1 0 0 1 
+s4 0 0 0 1 0 0 0 1 
+s5 0 0 1 0 0 0 0 1 
+s6 0 1 0 0 0 0 0 1 
+s7 1 0 0 0 0 0 0 1 

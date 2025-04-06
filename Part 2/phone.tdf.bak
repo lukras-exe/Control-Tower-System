@@ -1,0 +1,18 @@
+
+SUBDESIGN phone
+(	binary[2..0]		:INPUT
+	segments[6..0]		:OUTPUT)
+
+BEGIN
+	TABLE
+		binary[] => segments[];
+		0			=>	B"0100100";		-- 2 
+		1			=>	B"0000000";		-- 8
+		2			=>	B"1000000";		-- 0
+		3			=>	B"0111111";		-- -
+		4			=>	B"1111000";		-- 7
+		5			=>	B"1001111";		-- 1
+		6			=>	B"1000000";		-- 0
+		7			=>	B"0011001";		-- 4
+	END TABLE;
+END;	

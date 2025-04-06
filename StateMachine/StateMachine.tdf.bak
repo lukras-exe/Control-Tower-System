@@ -1,0 +1,224 @@
+SUBDESIGN fsm
+( clock, reset, hz, Txwl, Txw2, Sw9, Sw8, done, zero1, zero2           :INPUT;
+  inc_enl, inc_en2, dec_en1, dec_en2, delay_en, LedRunway 				:OUTPUT;)
+                
+                
+VARIABLE
+	sm : MACHINE
+   WITH STATES (s0, s1, s2, s3, s4, s5, s6, s7);
+                
+BEGIN
+sm.clk = clock;
+sm.ena = hz;
+
+
+CASE sm IS
+                WHEN s0 =>
+                                inc_en1 = GND;
+                                inc_en2 = GND;
+                                dec_en1 = GND;
+                                dec_en2 = GND;
+                                delay_en = GND;
+                                LedRunway = GND;
+                                
+                                IF !reset THEN
+                                                sm = s0;
+                                                
+                                ELSIF (Sw9, Sw8) == B"00" THEN
+                                                sm = s1;
+                                ELSIF (Sw9, Sw8) == B"10" THEN
+                                                sm = s2;
+                                ELSIF (Sw9, Sw8) == B"X1" THEN
+                                                sm = s7;
+                                                delay_en = Vcc;
+                                                LedRunway = Vcc;
+                                ELSE
+                                                sm = s0;
+                                END IF;
+                                
+                WHEN s1 =>
+                                inc_en1 = GND;
+                                inc_en2 = GND;
+                                dec_en1 = GND;
+                                dec_en2 = GND;
+                                delay_en = GND;
+                                LedRunway = GND;
+                                
+                                IF !reset THEN
+                                                sm = s0;
+                                
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"01" THEN
+                                                sm = s3;
+                                                inc_en1 = Vcc;
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"10" THEN
+                                                sm = s4;
+                                                inc_en2 = Vcc;
+                                ELSIF (Sw9, Sw8) == B"10" THEN
+                                                sm = s2;
+                                                
+                                ELSIF (Sw9, Sw8) == B"X1" THEN
+                                                sm = s7;
+                                                delay_en = Vcc;
+                                                LedRunway = Vcc;
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"00" THEN
+                                                sm = s1;
+                                END IF;
+                
+                                WHEN s2 =>
+                                                inc_en1 = GND;
+                                                inc_en2 = GND;
+                                                dec_en1 = GND;
+                                                dec_en2 = GND;
+                                                delay_en = GND;
+                                                LedRunway = GND;
+                                                
+                                                IF !reset THEN
+                                                                sm = s0;
+                                                
+                                ELSIF (sw9, Sw8) == B"10" & (!Txw2, !Txwl) == B"01" & (zero2, zero1) == B"X0" THEN
+                                                sm = s5;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"0X" THEN
+                                                sm = s6;
+                                ELSIF (Sw9, Sw8) == B"00" THEN
+                                                sm = s1;
+                                ELSIF (Sw9, Sw8) == B"X1" THEN
+                                                sm = s7
+                                                --delay_en = Vcc;
+                                                --LedRunway = Vcc;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"00" THEN
+                                                sm = s2;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"X1" THEN
+                                                sm = s2;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"1X" THEN
+                                                sm = s2;
+                                END IF;
+                
+                WHEN s3 =>
+                                --inc_en1 = GND;
+                                inc_en2 = GND;
+                                dec_en1 = GND;
+                                dec_en2 = GND;
+                                delay_en = GND;
+                                LedRunway = GND;
+                                                
+                                IF !reset THEN
+                                                sm = s0;
+                                
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"01" THEN
+                                                sm = s3;
+                                                inc_en1 = Vcc;
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"10" THEN
+                                                sm = s4;
+                                                inc_en2 = Vcc;
+                                ELSIF (Sw9, Sw8) == B"10" THEN
+                                                sm = s2;
+                                
+                                ELSIF (Sw9, Sw8) == B"X1" THEN
+                                                sm = s7;
+                                                delay_en = Vcc;
+                                                LedRunway = Vcc;
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"00" THEN
+                                                sm = s1;
+                                END IF;
+                                                
+                WHEN s4 =>
+                                inc_en1 = GND;
+                                --inc_en2 = GND;
+                                dec_en1 = GND;
+                                dec_en2 = GND;
+                                delay_en = GND;
+                                LedRunway = GND;
+                                                
+                                IF !reset THEN
+                                                sm = s0;
+                                
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"01" THEN
+                                                sm = s3;
+                                                inc_en1 = Vcc;
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"10" THEN
+                                                sm = s4;
+                                                inc_en2 = Vcc;
+                                ELSIF (Sw9, Sw8) == B"10" THEN
+                                                sm = s2;
+                                
+                                ELSIF (Sw9, Sw8) == B"X1" THEN
+                                                sm = s7;
+                                                delay_en = Vcc;
+                                                LedRunway = Vcc;
+                                ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txwl) == B"00" THEN
+                                                sm = s1;
+                                END IF;
+                                
+                WHEN s5 =>
+                                inc_en1 = GND;
+                                inc_en2 = GND;
+                                dec_en1 = GND;
+                                dec_en2 = GND;
+                                delay_en = GND;
+                                LedRunway = GND;
+                                                
+                                IF !reset THEN
+                                                sm = s0;
+                                                
+                                ELSE
+                                                sm = s7;
+                                END IF;
+                                
+                WHEN s6 =>
+                                inc_en1 = GND;
+                                inc_en2 = GND;
+                                dec_en1 = GND;
+                                dec_en2 = GND;
+                                delay_en = GND;
+                                LedRunway = GND;
+                                                
+                                IF !reset THEN
+                                                sm = s0;
+                                                
+                                ELSE
+                                                sm = s7;
+                                END IF;
+                                
+                WHEN s7 =>
+                                inc_en1 = GND;
+                                inc_en2 = GND;
+                                dec_en1 = GND;
+                                dec_en2 = GND;
+                                delay_en = GND;
+                                LedRunway = GND;
+                                                
+                                IF !reset THEN
+                                                sm = s0;
+                                                
+                                ELSE
+                                                sm = s7;
+                                
+                                ELSIF (sw9, Sw8) == B"10" & (!Txw2, !Txwl) == B"01" & (zero2, zero1) == B"X0" THEN
+                                                sm = s5;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"0X" THEN
+                                                sm = s6;
+                                ELSIF (Sw9, Sw8) == B"00" THEN
+                                                sm = s1;
+                                ELSIF (Sw9, Sw8) == B"X1" THEN
+                                                sm = s2;
+                                                delay_en = GND;
+                                                LedRunway = GND;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"00" THEN
+                                                sm = s2;
+                                                --delay_en = GND;
+                                                --LedRunway = GND;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"X1" THEN
+                                                sm = s2;
+                                                --delay_en = GND;
+                                                --LedRunway = GND;
+                                ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"1X" THEN
+                                                sm = s2;
+                                                --delay_en = GND;
+                                                --LedRunway = GND;
+                                END IF;
+                                
+                                
+                                
+                END CASE;
+
+END;

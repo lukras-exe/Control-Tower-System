@@ -1,0 +1,267 @@
+%
+Lukas Krapukaitis - Zachary Baker
+03/31/2025
+ECET 227 - MiniProject 
+Airport taxiway anagement state machine
+
+
+This design implements a state machine controller for managing aircraft
+movement on airport taxiways. It controls access to runways, tracks aircraft
+counts on two taxiways, and manages timing delays for runway operations.
+The state machine includes 8 states to handle various operational scenarios
+for airport ground traffic management.
+
+States
+ s0 - Reset/Initial state: System initialization, all outputs disabled
+ s1 - Ready for Increment: Waiting for aircraft to enter taxiways
+ s2 - Ready for Decrement: Waiting for aircraft to exit taxiways
+ s3 - Increment Taxiway 1: Aircraft entering Taxiway 1
+ s4 - Increment Taxiway 2: Aircraft entering Taxiway 2
+ s5 - Decrement Taxiway 1: Aircraft leaving Taxiway 1
+ s6 - Decrement Taxiway 2: Aircraft leaving Taxiway 2
+ s7 - Runway Operation: Runway in use with timing delay
+%
+
+
+SUBDESIGN statemachine
+( clock, reset, hz, Txw1, Txw2, Sw9, Sw8, done, zero1, zero2           :INPUT; --inputs
+  inc_en1, inc_en2, dec_en1, dec_en2, delay_en, LedRunway 				:OUTPUT;) --outputs
+                
+                
+VARIABLE
+	sm : MACHINE --machine with states
+   WITH STATES (s0, s1, s2, s3, s4, s5, s6, s7); --various state declarations
+                
+BEGIN
+	sm.clk = clock;	--assign clock of machine with input clock
+	sm.ena = hz;		--assign enable of machine of with HZ input from clock divider
+
+
+CASE sm IS
+	WHEN s0 =>				--state 0 reset
+		inc_en1 = GND;
+      inc_en2 = GND;
+      dec_en1 = GND;
+      dec_en2 = GND;
+      delay_en = GND;
+      LedRunway = GND;
+                                
+      IF !reset THEN --if external reset buttopn is pressed
+			sm = s0; --remain in current state
+                                                
+      ELSIF (Sw9, Sw8) == B"00" THEN
+         sm = s1;	-- Go to increment mode
+      ELSIF (Sw9, Sw8) == B"10" THEN
+         sm = s2;	-- Go to decrement mode
+      ELSIF (Sw9, Sw8) == B"X1" THEN
+         sm = s7;	-- Go to runway operation mode
+			delay_en = Vcc;
+         LedRunway = Vcc;
+      ELSE
+         sm = s0;	-- Default case - remain in reset
+      END IF;
+                                
+	WHEN s1 => --state 1 (ready for INC)
+		--Disable all outputs while waiting
+		inc_en1 = GND;
+		inc_en2 = GND;
+		dec_en1 = GND;
+		dec_en2 = GND;
+		delay_en = GND;
+		LedRunway = GND;
+                                
+		IF !reset THEN --if external reset button is pressed
+			sm = s0; --reset state
+                                
+		ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"01" THEN
+         -- Aircraft detected on Taxiway 1
+			sm = s3;
+         inc_en1 = Vcc;		-- Enable increment for Taxiway 1 counter
+      ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"10" THEN
+         -- Aircraft detected on Taxiway 2
+			sm = s4;
+			inc_en2 = Vcc;		-- Enable increment for Taxiway 2 counter
+      ELSIF (Sw9, Sw8) == B"10" THEN
+         sm = s2; --decrement mode
+                                                
+      ELSIF (Sw9, Sw8) == B"X1" THEN
+			-- Switch to runway operation mode
+			sm = s7;
+			delay_en = Vcc;
+			LedRunway = Vcc;
+		ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"00" THEN
+			-- No aircraft detected, remain in same state
+			sm = s1;
+      END IF;
+                
+	WHEN s2 => --state 2 (ready for dec)
+		inc_en1 = GND;
+		inc_en2 = GND;
+		dec_en1 = GND;
+		dec_en2 = GND;
+		delay_en = GND;
+		LedRunway = GND;
+                                                
+		IF !reset THEN --if external reset button is pressed
+			sm = s0; 	--reset state
+                                                
+		ELSIF (sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"01" & (zero2, zero1) == B"X0" THEN
+			-- Aircraft leaving Taxiway 1 (only if counter is not zero)
+			sm = s5;
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"0X" THEN
+			-- Aircraft leaving Taxiway 2 (only if counter is not zero)
+			sm = s6;
+		ELSIF (Sw9, Sw8) == B"00" THEN
+			-- Switch to increment mode
+			sm = s1;
+		ELSIF (Sw9, Sw8) == B"X1" THEN
+			-- Switch to runway operation mode
+			sm = s7;
+			--delay_en = Vcc;
+			--LedRunway = Vcc;
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"00" THEN
+			sm = s2;
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"X1" THEN
+			sm = s2;
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"1X" THEN
+			sm = s2;
+		END IF;
+                
+	WHEN s3 => --state 3 (incl)
+		--inc_en1 = Vcc;
+		inc_en2 = GND;
+		dec_en1 = GND;
+		dec_en2 = GND;
+		delay_en = GND;
+		LedRunway = GND;
+                                                
+		IF !reset THEN -- If reset button is pressed
+            sm = s0;   -- Return to reset state
+                                
+			ELSIF (Sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"01" THEN
+            -- Continue incrementing Taxiway 1
+            sm = s3;
+            inc_en1 = VCC;
+			ELSIF (Sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"10" THEN
+            -- Aircraft now detected on Taxiway 2
+            sm = s4;
+            inc_en2 = VCC;
+			ELSIF (Sw9, Sw8) == B"10" THEN
+            -- Switch to decrement mode
+            sm = s2;
+                                
+			ELSIF (Sw9, Sw8) == B"X1" THEN
+            -- Switch to runway operation mode
+            sm = s7;
+            delay_en = VCC;
+            LedRunway = VCC;
+			ELSIF (Sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"00" THEN
+            -- No aircraft detected, return to ready state
+            sm = s1;
+			END IF;
+                                                
+	WHEN s4 =>	--state 4 (incl2)
+		-- Reset all outputs, will set specific ones as needed
+		inc_en1 = GND;
+		--inc_en2 = Vcc;
+		dec_en1 = GND;
+		dec_en2 = GND;
+		delay_en = GND;
+		LedRunway = GND;
+                                                
+		IF !reset THEN --if external reset button is pressed
+			sm = s0; 	--reset state
+                                
+		ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"01" THEN
+			-- Aircraft now detected on Taxiway 1
+			sm = s3;
+			inc_en1 = Vcc;
+		ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"10" THEN
+			-- Continue incrementing Taxiway 2
+			sm = s4;
+			inc_en2 = Vcc;
+		ELSIF (Sw9, Sw8) == B"10" THEN
+			-- Switch to decrement mode
+			sm = s2;
+                                
+		ELSIF (Sw9, Sw8) == B"X1" THEN
+			 -- Switch to runway operation mode
+			sm = s7;
+			delay_en = Vcc;
+			LedRunway = Vcc;
+		ELSIF (sw9, Sw8) == B"00" & (!Txw2, !Txw1) == B"00" THEN
+			-- No aircraft detected, return to ready state
+			sm = s1;
+		END IF;
+                                
+	WHEN s5 => 	--state 5 (dec1)
+		inc_en1 = GND;
+		inc_en2 = GND;
+		dec_en1 = Vcc;
+		dec_en2 = GND;
+		delay_en = Vcc;
+		LedRunway = Vcc;
+                                                
+		IF !reset THEN		-- If reset button is presse
+			sm = s0;			-- Return to reset state
+                                                
+		ELSE
+			sm = s7;		-- Always transition to runway operation after decrement
+		END IF;
+                                
+	WHEN s6 =>	--state 6 (Dec2)
+		inc_en1 = GND;	-- Disable all outputs in this transitional state
+		inc_en2 = GND;
+		dec_en1 = GND;
+		dec_en2 = Vcc;
+		delay_en = vcc;
+		LedRunway = Vcc;
+                                                
+		IF !reset THEN --if external reset button is pressed
+			sm = s0;	--reset state
+                                                
+		ELSE
+			sm = s7;		 -- Always transition to runway operation after decrement
+		END IF;
+                                
+	WHEN s7 =>  	--state 7 (1 min delay, Runway busy)
+		inc_en1 = GND;
+		inc_en2 = GND;
+		dec_en1 = GND;
+		dec_en2 = GND;
+		delay_en = Vcc;		 -- Will be activated in transition logic if needed
+		LedRunway = Vcc;		-- Will be activated in transition logic if needed
+                                                
+		IF !reset THEN --if external reset button is pressed
+			sm = s0;		--reset state
+                                                
+		ELSIF !done THEN
+			sm = s7; --hold state
+                                
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"01" & (zero2, zero1) == B"X0" THEN
+			sm = s5;	 			-- Aircraft leaving Taxiway 1 (only if counter is not zero)
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"0X" THEN
+			sm = s6;				-- Aircraft leaving Taxiway 2 (only if counter is not zero)
+		ELSIF (Sw9, Sw8) == B"00" THEN
+			sm = s1;				-- Switch to increment mode
+		ELSIF (Sw9, Sw8) == B"X1" THEN
+			sm = s2;			-- Remain in runway operation mode
+			--delay_en = GND;
+			--LedRunway = GND;
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"00" THEN
+			sm = s2;		-- Switch to decrement mode with no aircraft detected
+			--delay_en = GND;
+			--LedRunway = GND;
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"X1" THEN
+			sm = s2;		-- Switch to decrement mode, but Taxiway 1 is empty
+			delay_en = GND;
+			LedRunway = GND;
+		ELSIF (Sw9, Sw8) == B"10" & (!Txw2, !Txw1) == B"10" & (zero2, zero1) == B"1X" THEN
+			sm = s2;		-- Switch to decrement mode, but Taxiway 2 is empty
+			--delay_en = GND;
+			--LedRunway = GND;
+		END IF;                           
+                                
+	END CASE;
+
+END;
